@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brazilian Cleaning Booking</title>
+    <title>Brazilian Cleaning | Internal Booking</title>
     <style>
         :root {
             --brazil-green: #2D9546;
             --brazil-blue: #1E5B9A;
             --brazil-gold: #F9C21C;
-            --light-bg: #f4f7f6;
+            --light-bg: #f8f9fa;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: var(--light-bg);
             margin: 0;
             display: flex;
@@ -22,135 +22,182 @@
 
         .app-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             background: white;
             min-height: 100vh;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
         }
 
         header {
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
-            border-bottom: 3px solid var(--brazil-gold);
+            background: white;
+            border-bottom: 4px solid var(--brazil-gold);
         }
 
-        .logo-placeholder {
-            font-weight: bold;
-            font-size: 24px;
+        .logo-text {
+            font-weight: 800;
+            font-size: 26px;
+            letter-spacing: -1px;
+        }
+
+        .section {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        h3 {
+            margin-top: 0;
             color: var(--brazil-blue);
+            font-size: 16px;
             text-transform: uppercase;
         }
 
-        .calendar-section {
-            padding: 20px;
-        }
-
-        input[type="date"] {
+        input, select {
             width: 100%;
             padding: 12px;
-            border: 2px solid var(--brazil-green);
-            border-radius: 8px;
+            margin-top: 8px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             font-size: 16px;
-            margin-top: 10px;
+            box-sizing: border-box;
         }
 
-        .services {
-            padding: 20px;
+        input:focus {
+            border-color: var(--brazil-green);
+            outline: none;
         }
 
-        .service-card {
-            border: 1px solid #ddd;
-            border-left: 5px solid var(--brazil-green);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .service-btn {
+            border: 2px solid #eee;
+            padding: 15px 10px;
+            border-radius: 12px;
+            text-align: center;
             cursor: pointer;
-            transition: 0.3s;
+            font-weight: 600;
+            transition: 0.2s;
+            font-size: 14px;
         }
 
-        .service-card:hover {
-            background-color: #f0fff4;
+        .service-btn.active {
+            border-color: var(--brazil-green);
+            background-color: #eef9f0;
+            color: var(--brazil-green);
         }
 
-        .service-card.selected {
-            background-color: #e6f4ea;
-            border-color: var(--brazil-blue);
+        .footer {
+            margin-top: auto;
+            padding: 20px;
         }
 
         .book-btn {
-            display: block;
-            width: 90%;
-            margin: 20px auto;
+            width: 100%;
             background-color: var(--brazil-green);
             color: white;
-            text-align: center;
-            padding: 15px;
+            padding: 18px;
             border: none;
-            border-radius: 30px;
+            border-radius: 50px;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(45, 149, 70, 0.3);
         }
 
-        .book-btn:active {
-            transform: scale(0.98);
-        }
+        .book-btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <header>
-        <div class="logo-placeholder">
-            <span style="color:var(--brazil-green)">Brazilian</span> <span style="color:var(--brazil-blue)">Cleaning</span>
+        <div class="logo-text">
+            <span style="color:var(--brazil-green)">BRAZILIAN</span> 
+            <span style="color:var(--brazil-blue)">CLEANING</span>
         </div>
     </header>
 
-    <div class="calendar-section">
-        <h3>1. Select a Date</h3>
-        <input type="date" id="bookingDate">
+    <div class="section">
+        <h3>1. Appointment Details</h3>
+        <label>Date</label>
+        <input type="date" id="bookDate">
+        
+        <label style="display:block; margin-top:15px;">Time (8 AM - 6 PM)</label>
+        <select id="bookTime">
+            </select>
     </div>
 
-    <div class="services">
-        <h3>2. Choose Service</h3>
-        <div class="service-card" onclick="selectService(this, 'Standard Cleaning')">
-            <strong>Standard Cleaning</strong><br>
-            <small>Approx. 2-3 hours • From $120</small>
-        </div>
-        <div class="service-card" onclick="selectService(this, 'Deep Cleaning')">
-            <strong>Deep Cleaning</strong><br>
-            <small>Approx. 4-6 hours • From $250</small>
-        </div>
-        <div class="service-card" onclick="selectService(this, 'Move In/Out')">
-            <strong>Move In/Out</strong><br>
-            <small>Full detail clean • From $350</small>
+    <div class="section">
+        <h3>2. Service Type</h3>
+        <div class="service-grid">
+            <div class="service-btn" onclick="setService(this, 'Standard')">Standard</div>
+            <div class="service-btn" onclick="setService(this, 'Deep Clean')">Deep Clean</div>
+            <div class="service-btn" onclick="setService(this, 'Move In/Out')">Move In/Out</div>
+            <div class="service-btn" onclick="setService(this, 'Office')">Office</div>
         </div>
     </div>
 
-    <button class="book-btn" onclick="confirmBooking()">BOOK APPOINTMENT</button>
+    <div class="section">
+        <h3>3. Client Info</h3>
+        <input type="text" id="clientName" placeholder="Client Name">
+        <input type="text" id="clientAddress" placeholder="Address">
+    </div>
+
+    <div class="footer">
+        <button class="book-btn" onclick="sendToWhatsApp()">SEND TO WHATSAPP</button>
+    </div>
 </div>
 
 <script>
-    let selectedService = "";
-
-    function selectService(element, serviceName) {
-        // Deselect all
-        document.querySelectorAll('.service-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        // Select clicked
-        element.classList.add('selected');
-        selectedService = serviceName;
+    // 1. Setup Time Slots
+    const timeSelect = document.getElementById('bookTime');
+    for(let h=8; h<=18; h++) {
+        let suffix = h >= 12 ? "PM" : "AM";
+        let displayHour = h > 12 ? h - 12 : h;
+        if(h === 12) displayHour = 12;
+        
+        let option = document.createElement('option');
+        option.value = `${displayHour}:00 ${suffix}`;
+        option.text = `${displayHour}:00 ${suffix}`;
+        timeSelect.appendChild(option);
     }
 
-    function confirmBooking() {
-        const date = document.getElementById('bookingDate').value;
-        if(!date || !selectedService) {
-            alert("Please select both a date and a service!");
+    // 2. Handle Service Selection
+    let selectedService = "";
+    function setService(el, name) {
+        document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        selectedService = name;
+    }
+
+    // 3. Send Data to her WhatsApp
+    function sendToWhatsApp() {
+        const date = document.getElementById('bookDate').value;
+        const time = document.getElementById('bookTime').value;
+        const name = document.getElementById('clientName').value;
+        const addr = document.getElementById('clientAddress').value;
+        const phone = "1234567890"; // <-- PUT YOUR WIFE'S PHONE NUMBER HERE (Numbers only)
+
+        if(!date || !selectedService || !name) {
+            alert("Please fill in Date, Service, and Name!");
             return;
         }
-        alert(`Success! Your ${selectedService} is scheduled for ${date}. We will contact you shortly!`);
+
+        const message = `*New Cleaning Appointment*%0A` +
+                        `--------------------------%0A` +
+                        `*Service:* ${selectedService}%0A` +
+                        `*Date:* ${date}%0A` +
+                        `*Time:* ${time}%0A` +
+                        `*Client:* ${name}%0A` +
+                        `*Address:* ${addr}`;
+
+        window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
     }
 </script>
 
