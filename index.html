@@ -1,38 +1,42 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <link rel="icon" type="image/png" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BC | Admin Calendar</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <style>
-        :root { --green: #2D9546; --blue: #1E5B9A; --gold: #F9C21C; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 10px; }
+        :root { --green: #2D9546; --blue: #1E5B9A; --gold: #F9C21C; --red: #d9534f; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 10px; }
         
-        header { text-align: center; padding: 10px; background: white; border-radius: 15px; margin-bottom: 10px; border-bottom: 4px solid var(--gold); }
-        .logo { font-weight: 900; font-size: 20px; }
+        header { text-align: center; padding: 15px; background: white; border-radius: 15px; margin-bottom: 10px; border-bottom: 4px solid var(--gold); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .logo { font-weight: 900; font-size: 22px; letter-spacing: -0.5px; }
         
-        #calendar-card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        #calendar-card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         
-        /* Calendar Styling */
-        .fc-toolbar-title { font-size: 1.1em !important; color: var(--blue); }
-        .fc-button-primary { background-color: var(--green) !important; border: none !important; }
-        .fc-daygrid-event { background-color: var(--blue) !important; border: none !important; }
+        /* Calendar UI Tweaks */
+        .fc-toolbar-title { font-size: 1.2em !important; color: var(--blue); font-weight: bold; }
+        .fc-button-primary { background-color: var(--blue) !important; border: none !important; text-transform: capitalize !important; }
+        .fc-button-primary:hover { background-color: var(--green) !important; }
+        .fc-daygrid-event { background-color: var(--blue) !important; border: none !important; padding: 2px 5px; cursor: pointer; }
+        .fc-day-today { background: rgba(249, 194, 28, 0.1) !important; }
 
-        /* Modal / Form Styling */
+        /* Modal Styling */
         #booking-modal { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 350px; background: white; padding: 20px; z-index: 100;
-            border-radius: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            width: 90%; max-width: 380px; background: white; padding: 25px; z-index: 100;
+            border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 90; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 90; backdrop-filter: blur(2px); }
         
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .save-btn { background: var(--green); color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; }
-        .close-btn { background: #eee; color: #666; margin-top: 5px; border: none; width: 100%; padding: 10px; border-radius: 10px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; transition: border 0.3s; }
+        input:focus { border-color: var(--blue); outline: none; }
+        
+        .save-btn { background: var(--green); color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .close-btn { background: transparent; color: #888; margin-top: 10px; border: none; width: 100%; padding: 10px; border-radius: 10px; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -41,27 +45,20 @@
         <div class="logo">
             <span style="color:var(--green)">BRAZILIAN</span> <span style="color:var(--blue)">CLEANING</span>
         </div>
-        <small style="color:#999">Admin Schedule Manager</small>
+        <small style="color:#666; font-weight: 500;">ADMIN SCHEDULE MANAGER</small>
     </header>
 
     <div id="calendar-card">
         <div id="calendar"></div>
     </div>
 
-    <div class="overlay" id="overlay"></div>
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+    
     <div id="booking-modal">
-        <h3 id="selected-date-display" style="color:var(--blue); margin-top:0;">New Appointment</h3>
+        <h3 id="selected-date-display" style="color:var(--blue); margin:0 0 15px 0;">New Appointment</h3>
         <input type="text" id="client-name" placeholder="Client Name">
-        <select id="appt-time">
-            <script>
-                for(let i=8; i<=18; i++) {
-                    let h = i > 12 ? i-12 : i;
-                    let ampm = i >= 12 ? 'PM' : 'AM';
-                    document.write(`<option value="${h}:00 ${ampm}">${h}:00 ${ampm}</option>`);
-                }
-            </script>
-        </select>
-        <textarea id="notes" placeholder="Address & Specific Notes"></textarea>
+        <select id="appt-time"></select>
+        <textarea id="notes" rows="3" placeholder="Address & Specific Notes (e.g. Dog inside, key under mat)"></textarea>
         <button class="save-btn" onclick="saveAppointment()">SAVE TO CALENDAR</button>
         <button class="close-btn" onclick="closeModal()">CANCEL</button>
     </div>
@@ -71,33 +68,58 @@
         let selectedDateStr;
         let appointments = JSON.parse(localStorage.getItem('cleaning_appts')) || [];
 
+        // Generate Time Options
+        const timeSelect = document.getElementById('appt-time');
+        for(let i=7; i<=19; i++) {
+            let h = i > 12 ? i-12 : i;
+            let ampm = i >= 12 ? 'PM' : 'AM';
+            let timeStr = `${h}:00 ${ampm}`;
+            let option = new Option(timeStr, timeStr);
+            timeSelect.add(option);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
+                headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+                height: 'auto',
                 events: appointments,
                 dateClick: function(info) {
-                    selectedDateStr = info.dateStr;
-                    document.getElementById('selected-date-display').innerText = "Book for " + selectedDateStr;
-                    document.getElementById('booking-modal').style.display = 'block';
-                    document.getElementById('overlay').style.display = 'block';
+                    openModal(info.dateStr);
+                },
+                eventClick: function(info) {
+                    if(confirm(`Delete appointment for "${info.event.title}"?`)) {
+                        info.event.remove();
+                        // Update LocalStorage
+                        appointments = appointments.filter(e => 
+                            !(e.title === info.event.title && e.start === info.event.startStr)
+                        );
+                        localStorage.setItem('cleaning_appts', JSON.stringify(appointments));
+                    }
                 }
             });
             calendar.render();
         });
+
+        function openModal(date) {
+            selectedDateStr = date;
+            document.getElementById('selected-date-display').innerText = "Book: " + date;
+            document.getElementById('booking-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
 
         function saveAppointment() {
             const name = document.getElementById('client-name').value;
             const time = document.getElementById('appt-time').value;
             const notes = document.getElementById('notes').value;
 
-            if(!name) { alert("Please enter a name"); return; }
+            if(!name) { alert("Please enter a client name"); return; }
 
             const newEvent = {
                 title: `${time} - ${name}`,
                 start: selectedDateStr,
-                description: notes,
+                extendedProps: { notes: notes },
                 allDay: true
             };
 
@@ -106,7 +128,7 @@
             calendar.addEvent(newEvent);
             
             closeModal();
-            // Clear inputs
+            // Reset fields
             document.getElementById('client-name').value = "";
             document.getElementById('notes').value = "";
         }
