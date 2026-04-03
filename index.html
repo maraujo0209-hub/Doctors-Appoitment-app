@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brazilian Cleaning Booking</title>
+    <style>
+        :root {
+            --brazil-green: #2D9546;
+            --brazil-blue: #1E5B9A;
+            --brazil-gold: #F9C21C;
+            --light-bg: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--brazil-gold);
+        }
+
+        .logo-placeholder {
+            font-weight: bold;
+            font-size: 24px;
+            color: var(--brazil-blue);
+            text-transform: uppercase;
+        }
+
+        .calendar-section {
+            padding: 20px;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--brazil-green);
+            border-radius: 8px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .services {
+            padding: 20px;
+        }
+
+        .service-card {
+            border: 1px solid #ddd;
+            border-left: 5px solid var(--brazil-green);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .service-card:hover {
+            background-color: #f0fff4;
+        }
+
+        .service-card.selected {
+            background-color: #e6f4ea;
+            border-color: var(--brazil-blue);
+        }
+
+        .book-btn {
+            display: block;
+            width: 90%;
+            margin: 20px auto;
+            background-color: var(--brazil-green);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .book-btn:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="logo-placeholder">
+            <span style="color:var(--brazil-green)">Brazilian</span> <span style="color:var(--brazil-blue)">Cleaning</span>
+        </div>
+    </header>
+
+    <div class="calendar-section">
+        <h3>1. Select a Date</h3>
+        <input type="date" id="bookingDate">
+    </div>
+
+    <div class="services">
+        <h3>2. Choose Service</h3>
+        <div class="service-card" onclick="selectService(this, 'Standard Cleaning')">
+            <strong>Standard Cleaning</strong><br>
+            <small>Approx. 2-3 hours • From $120</small>
+        </div>
+        <div class="service-card" onclick="selectService(this, 'Deep Cleaning')">
+            <strong>Deep Cleaning</strong><br>
+            <small>Approx. 4-6 hours • From $250</small>
+        </div>
+        <div class="service-card" onclick="selectService(this, 'Move In/Out')">
+            <strong>Move In/Out</strong><br>
+            <small>Full detail clean • From $350</small>
+        </div>
+    </div>
+
+    <button class="book-btn" onclick="confirmBooking()">BOOK APPOINTMENT</button>
+</div>
+
+<script>
+    let selectedService = "";
+
+    function selectService(element, serviceName) {
+        // Deselect all
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        // Select clicked
+        element.classList.add('selected');
+        selectedService = serviceName;
+    }
+
+    function confirmBooking() {
+        const date = document.getElementById('bookingDate').value;
+        if(!date || !selectedService) {
+            alert("Please select both a date and a service!");
+            return;
+        }
+        alert(`Success! Your ${selectedService} is scheduled for ${date}. We will contact you shortly!`);
+    }
+</script>
+
+</body>
+</html>
