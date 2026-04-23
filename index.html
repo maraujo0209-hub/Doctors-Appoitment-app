@@ -14,7 +14,6 @@
         :root { 
             --doc-navy: #1A3668; 
             --doc-green: #4D9345;
-            --doc-accent: #E8F0F8;
         }
 
         body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: #f0f4f7; margin: 0; padding: 10px; }
@@ -29,45 +28,29 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         
-        .logo-img {
-            height: 90px; 
-            margin-bottom: 10px; 
-            object-fit: contain;
-        }
+        .logo-img { height: 90px; margin-bottom: 10px; object-fit: contain; }
 
-        .header-title {
-            margin: 0;
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
+        .header-title { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; }
         .text-navy { color: var(--doc-navy); }
         .text-green { color: var(--doc-green); }
 
         #calendar-card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         
-        /* Calendar Buttons & Labels */
         .fc-toolbar-title { color: var(--doc-navy) !important; font-weight: 700; }
         .fc-button-primary { background-color: var(--doc-navy) !important; border: none !important; }
         .fc-button-primary:hover { background-color: var(--doc-green) !important; }
 
-        /* Event Bubbles */
         .fc-event { 
-            cursor: pointer; 
-            padding: 5px !important; 
-            border: none !important;
+            cursor: pointer; padding: 5px !important; border: none !important;
             background-color: var(--doc-navy) !important;
             border-left: 4px solid var(--doc-green) !important;
             margin-bottom: 3px !important;
         }
 
-        .event-title-stack { color: white; line-height: 1.2; overflow: hidden; }
+        .event-title-stack { color: white; line-height: 1.2; }
         .event-name { font-weight: bold; display: block; text-transform: uppercase; font-size: 0.85em; }
         .event-time { font-weight: normal; opacity: 0.9; font-size: 0.75em; }
 
-        /* Modal */
         #booking-modal { 
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 400px; background: white; padding: 25px; z-index: 100;
@@ -101,12 +84,10 @@
     
     <div id="booking-modal">
         <h3 id="selected-date-display" style="color:var(--doc-navy); margin:0 0 20px 0;">New Appointment</h3>
-        
         <div class="form-group">
             <label>PATIENT NAME</label>
             <input type="text" id="patient-name" placeholder="Full name">
         </div>
-
         <div style="display: flex; gap: 10px;">
             <div class="form-group" style="flex: 1;">
                 <label>START TIME</label>
@@ -117,12 +98,10 @@
                 <select id="end-time"></select>
             </div>
         </div>
-
         <div class="form-group">
             <label>NOTES / REASON</label>
             <textarea id="notes" rows="3" placeholder="Visit details..."></textarea>
         </div>
-
         <button class="save-btn" onclick="saveAppointment()">CONFIRM APPOINTMENT</button>
         <button class="close-btn" onclick="closeModal()">CANCEL</button>
     </div>
@@ -130,7 +109,9 @@
     <script>
         let calendar;
         let selectedDateStr;
-        let appointments = JSON.parse(localStorage.getItem('doc_calendar_data')) || [];
+        // THE FIX: Using one consistent key for all data
+        const STORAGE_KEY = 'doc_appointment_system';
+        let appointments = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
         function populateTimes() {
             const startSelect = document.getElementById('start-time');
@@ -163,10 +144,21 @@
                 dateClick: function(info) { openModal(info.dateStr); },
                 eventClick: function(info) {
                     const notes = info.event.extendedProps.notes || "No notes";
-                    if(confirm(`PATIENT: ${info.event.title}\nNOTES: ${notes}\n\nDelete?`)) {
+                    if(confirm(`PATIENT: ${info.event.title}\nNOTES: ${notes}\n\nDelete this appointment?`)) {
+                        
+                        // 1. Remove from the visual calendar
                         info.event.remove();
-                        appointments = appointments.filter(e => !(e.title === info.event.title && e.start === info.event.startStr));
-                        localStorage.setItem('doc_calendar_data', JSON.stringify(appointments));
+
+                        // 2. Remove from the appointments array
+                        // We filter by comparing name AND start time to ensure we delete the right one
+                        appointments = appointments.filter(e => {
+                            return !(e.title === info.event.title && e.start === info.event.startStr);
+                        });
+
+                        // 3. Update the storage permanently
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+                        
+                        console.log("Appointment deleted. Remaining:", appointments.length);
                     }
                 }
             });
@@ -186,6 +178,7 @@
             const endTime = document.getElementById('end-time').value;
             const notes = document.getElementById('notes').value;
             if(!name) { alert("Enter patient name"); return; }
+            
             const newEvent = {
                 title: name,
                 start: `${selectedDateStr}T${startTime}:00`,
@@ -193,8 +186,9 @@
                 extendedProps: { notes: notes },
                 allDay: false
             };
+
             appointments.push(newEvent);
-            localStorage.setItem('doc_calendar_data', JSON.stringify(appointments));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
             calendar.addEvent(newEvent);
             closeModal();
             document.getElementById('patient-name').value = "";
@@ -207,4 +201,4 @@
         }
     </script>
 </body>
-</html>>
+</html>
