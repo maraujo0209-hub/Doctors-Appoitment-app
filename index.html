@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <link rel="icon" type="image/png" href="Doctors appointment logo.png">
+    
     <link rel="apple-touch-icon" href="Doctors appointment logo.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Doc Appt">
+
+    <meta name="mobile-web-app-capable" content="yes">
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Doctor's Appointment | Admin</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
@@ -36,7 +43,7 @@
 
         #calendar-card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         
-        .fc-toolbar-title { color: var(--doc-navy) !important; font-weight: 700; }
+        .fc-toolbar-title { color: var(--doc-navy) !important; font-weight: 700; font-size: 1.2em !important; }
         .fc-button-primary { background-color: var(--doc-navy) !important; border: none !important; }
         .fc-button-primary:hover { background-color: var(--doc-green) !important; }
 
@@ -109,7 +116,6 @@
     <script>
         let calendar;
         let selectedDateStr;
-        // THE FIX: Using one consistent key for all data
         const STORAGE_KEY = 'doc_appointment_system';
         let appointments = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
@@ -145,20 +151,11 @@
                 eventClick: function(info) {
                     const notes = info.event.extendedProps.notes || "No notes";
                     if(confirm(`PATIENT: ${info.event.title}\nNOTES: ${notes}\n\nDelete this appointment?`)) {
-                        
-                        // 1. Remove from the visual calendar
                         info.event.remove();
-
-                        // 2. Remove from the appointments array
-                        // We filter by comparing name AND start time to ensure we delete the right one
                         appointments = appointments.filter(e => {
                             return !(e.title === info.event.title && e.start === info.event.startStr);
                         });
-
-                        // 3. Update the storage permanently
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
-                        
-                        console.log("Appointment deleted. Remaining:", appointments.length);
                     }
                 }
             });
